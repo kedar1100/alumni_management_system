@@ -30,7 +30,7 @@ Markdown editor built with Next.js and React. -->
 ### Donation Management 
 • Track contributions to the institution
 ## Tech Stack 
-Java , spring boot , maven , mysql , Thunder Client (to check backend)
+Java (backend ) , html css javascript (front end), spring boot (to use api) , maven (to start on local machine) , mysql (database management system ) , Thunder Client (to check backend)
 
 <!-- ## Features
 
