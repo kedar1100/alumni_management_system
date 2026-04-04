@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Alumni Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">🎓 AlumniMS</div>
+        <div class="nav-links">
+            <a href="/login">Login</a>
+            <a href="/register" class="btn-primary">Register</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Welcome to Alumni Connect</h1>
+        <p>Stay connected with your batchmates, find jobs, and attend events</p>
+        <div class="hero-buttons">
+            <a href="/register" class="btn-primary">Get Started</a>
+            <a href="/login" class="btn-outline">Login</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>Alumni Directory</h3>
+            <p>Connect with alumni from your batch and department</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Events</h3>
+            <p>Stay updated on reunions, seminars and meetups</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💼</div>
+            <h3>Job Board</h3>
+            <p>Find and post job opportunities within the network</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📢</div>
+            <h3>Announcements</h3>
+            <p>Get the latest news and updates from your institution</p>
+        </div>
+    </section>
+
+</body>
+</html>

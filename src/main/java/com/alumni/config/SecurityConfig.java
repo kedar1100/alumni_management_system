@@ -22,7 +22,13 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/alumni/**").permitAll()
+                .requestMatchers("/api/events/**").permitAll()
+                .requestMatchers("/api/jobs/**").permitAll()
+                .requestMatchers("/api/announcements/**").permitAll()
+                .requestMatchers("/", "/home", "/register", "/login").permitAll()
+                .requestMatchers("/css/**", "/js/**").permitAll()
+                .anyRequest().authenticated()    // ← always LAST!
             )
             .httpBasic(httpBasic -> httpBasic.disable())
             .formLogin(form -> form.disable());
