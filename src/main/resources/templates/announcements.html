@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Announcements - AlumniMS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">🎓 AlumniMS</a>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/events">Events</a>
+            <a href="/jobs">Jobs</a>
+            <a href="/announcements">Announcements</a>
+            <a href="/directory">Directory</a>
+            <a href="/login" class="btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard">
+
+        <div class="welcome-banner">
+            <h2>📢 Announcements</h2>
+            <p>Latest news and updates from your institution</p>
+        </div>
+
+        <div id="announcementsList">
+            <p style="color:#777;font-size:13px;">Loading announcements...</p>
+        </div>
+
+    </div>
+
+    <script>
+        window.onload = function() {
+            loadAnnouncements();
+        };
+
+        async function loadAnnouncements() {
+            try {
+                const res = await fetch('/api/announcements/all');
+                const data = await res.json();
+                const list = document.getElementById('announcementsList');
+
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color:#777;">No announcements yet!</p>';
+                    return;
+                }
+
+                list.innerHTML = data.map(a => `
+                    <div class="announcement-card">
+                        <div class="announcement-header">
+                            <h4>${a.title}</h4>
+                            <span class="badge badge-green">New</span>
+                        </div>
+                        <p>${a.content}</p>
+                        <div class="announcement-footer">
+                            <span>📅 ${a.postedAt ? a.postedAt.substring(0,10) : ''}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                document.getElementById('announcementsList').innerHTML =
+                    '<p style="color:#777;">Could not load announcements</p>';
+            }
+        }
+    </script>
+
+</body>
+</html>

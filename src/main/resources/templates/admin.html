@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - AlumniMS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- PASSWORD GATE -->
+    <div id="passwordGate">
+        <div class="form-container">
+            <h2>🔒 Admin Access</h2>
+            <p style="text-align:center;color:#777;font-size:13px;margin-bottom:20px;">
+                This area is restricted to administrators only
+            </p>
+            <div id="gateError" class="error-box" style="display:none;">
+                Wrong password! Access denied.
+            </div>
+            <div class="form-group">
+                <label>Admin Password</label>
+                <input type="password" id="adminPassword"
+                    placeholder="Enter admin password"
+                    onkeypress="if(event.key==='Enter') checkPassword()" />
+            </div>
+            <button class="form-submit" onclick="checkPassword()">
+                Access Admin Panel
+            </button>
+            <div class="form-footer">
+                <a href="/dashboard">← Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL (hidden until password correct) -->
+    <div id="adminPanel" style="display:none;">
+
+        <nav class="navbar">
+            <a href="/" class="nav-brand">🎓 AlumniMS</a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <span style="font-size:13px;color:#185FA5;font-weight:500;">
+                    ⚙️ Admin Panel
+                </span>
+                <button onclick="lockAdmin()" class="btn-outline">🔒 Lock</button>
+                <a href="/login" class="btn-outline">Logout</a>
+            </div>
+        </nav>
+
+        <div class="dashboard">
+
+            <div class="welcome-banner">
+                <h2>⚙️ Admin Panel</h2>
+                <p>Manage alumni, events, jobs and announcements</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value" id="totalAlumni">...</div>
+                    <div class="label">Total Alumni</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="totalEvents">...</div>
+                    <div class="label">Total Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="totalJobs">...</div>
+                    <div class="label">Job Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="totalAnnouncements">...</div>
+                    <div class="label">Announcements</div>
+                </div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showTab('alumni', event)">👥 Alumni</button>
+                <button class="tab-btn" onclick="showTab('events', event)">📅 Events</button>
+                <button class="tab-btn" onclick="showTab('jobs', event)">💼 Jobs</button>
+                <button class="tab-btn" onclick="showTab('announcements', event)">📢 Announcements</button>
+            </div>
+
+            <!-- Alumni Tab -->
+            <div id="tab-alumni" class="tab-content">
+                <div class="card">
+                    <h3>All Alumni</h3>
+                    <div id="alumniList">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Events Tab -->
+            <div id="tab-events" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3>Create New Event</h3>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>Event Title</label>
+                            <input type="text" id="eventTitle" placeholder="Annual Alumni Meet" />
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="eventDesc" rows="3" placeholder="Event description..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="eventLocation" placeholder="Pune" />
+                        </div>
+                        <div class="form-group">
+                            <label>Date & Time</label>
+                            <input type="datetime-local" id="eventDate" />
+                        </div>
+                        <button class="btn-primary" onclick="createEvent()">Create Event</button>
+                    </div>
+                    <div id="eventMsg" style="margin-top:12px;"></div>
+                </div>
+                <div class="card" style="margin-top:20px;">
+                    <h3>All Events</h3>
+                    <div id="eventsList">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Jobs Tab -->
+            <div id="tab-jobs" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3>Post New Job</h3>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>Job Title</label>
+                            <input type="text" id="jobTitle" placeholder="Software Engineer" />
+                        </div>
+                        <div class="form-group">
+                            <label>Company</label>
+                            <input type="text" id="jobCompany" placeholder="Google" />
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="jobLocation" placeholder="Pune" />
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="jobDesc" rows="3" placeholder="Job description..."></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="createJob()">Post Job</button>
+                    </div>
+                    <div id="jobMsg" style="margin-top:12px;"></div>
+                </div>
+                <div class="card" style="margin-top:20px;">
+                    <h3>All Jobs</h3>
+                    <div id="jobsList">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="tab-announcements" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3>Post New Announcement</h3>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" id="annTitle" placeholder="Announcement title..." />
+                        </div>
+                        <div class="form-group">
+                            <label>Content</label>
+                            <textarea id="annContent" rows="4" placeholder="Announcement content..."></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="createAnnouncement()">
+                            Post Announcement
+                        </button>
+                    </div>
+                    <div id="annMsg" style="margin-top:12px;"></div>
+                </div>
+                <div class="card" style="margin-top:20px;">
+                    <h3>All Announcements</h3>
+                    <div id="annList">Loading...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = 'alumni@admin123'; // 🔑 change this!
+        const ADMIN_USER_ID = 1;
+
+        // Check if already unlocked this session
+        window.onload = function() {
+            if (sessionStorage.getItem('adminUnlocked') === 'true') {
+                showAdminPanel();
+            }
+        };
+
+        // Check Password
+        function checkPassword() {
+            const entered = document.getElementById('adminPassword').value;
+            if (entered === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminUnlocked', 'true');
+                showAdminPanel();
+            } else {
+                document.getElementById('gateError').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                // Shake animation
+                document.querySelector('.form-container').style.animation = 'shake 0.3s';
+                setTimeout(() => {
+                    document.querySelector('.form-container').style.animation = '';
+                }, 300);
+            }
+        }
+
+        // Show Admin Panel
+        function showAdminPanel() {
+            document.getElementById('passwordGate').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadStats();
+            loadAlumni();
+        }
+
+        // Lock Admin
+        function lockAdmin() {
+            sessionStorage.removeItem('adminUnlocked');
+            document.getElementById('passwordGate').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        // Tab Switching
+        function showTab(tab, e) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).style.display = 'block';
+            e.target.classList.add('active');
+            if (tab === 'events') loadEvents();
+            if (tab === 'jobs') loadJobs();
+            if (tab === 'announcements') loadAnnouncements();
+        }
+
+        // Load Stats
+        async function loadStats() {
+            try {
+                const [alumni, events, jobs, ann] = await Promise.all([
+                    fetch('/api/alumni/all').then(r => r.json()),
+                    fetch('/api/events/all').then(r => r.json()),
+                    fetch('/api/jobs/all').then(r => r.json()),
+                    fetch('/api/announcements/all').then(r => r.json())
+                ]);
+                document.getElementById('totalAlumni').textContent = alumni.length;
+                document.getElementById('totalEvents').textContent = events.length;
+                document.getElementById('totalJobs').textContent = jobs.length;
+                document.getElementById('totalAnnouncements').textContent = ann.length;
+            } catch(e) { console.log('Stats error'); }
+        }
+
+        // Load Alumni
+        async function loadAlumni() {
+            try {
+                const res = await fetch('/api/alumni/all');
+                const data = await res.json();
+                const list = document.getElementById('alumniList');
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color:#777;">No alumni yet</p>';
+                    return;
+                }
+                list.innerHTML = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Batch</th>
+                                <th>Company</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(a => `
+                                <tr>
+                                    <td>${a.firstName} ${a.lastName}</td>
+                                    <td>${a.department || '-'}</td>
+                                    <td>${a.batchYear || '-'}</td>
+                                    <td>${a.currentCompany || '-'}</td>
+                                    <td>${a.location || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>`;
+            } catch(e) {
+                document.getElementById('alumniList').innerHTML =
+                    '<p style="color:#777;">Could not load alumni</p>';
+            }
+        }
+
+        // Load Events
+        async function loadEvents() {
+            try {
+                const res = await fetch('/api/events/all');
+                const data = await res.json();
+                const list = document.getElementById('eventsList');
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color:#777;">No events yet</p>';
+                    return;
+                }
+                list.innerHTML = data.map(e => `
+                    <div class="list-item">
+                        <div>
+                            <div style="font-weight:500;">${e.title}</div>
+                            <div style="font-size:12px;color:#777;">
+                                ${e.location} · ${e.eventDate ? e.eventDate.substring(0,10) : ''}
+                            </div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteEvent(${e.id})">Delete</button>
+                    </div>`).join('');
+            } catch(e) {
+                document.getElementById('eventsList').innerHTML =
+                    '<p style="color:#777;">Could not load</p>';
+            }
+        }
+
+        // Load Jobs
+        async function loadJobs() {
+            try {
+                const res = await fetch('/api/jobs/all');
+                const data = await res.json();
+                const list = document.getElementById('jobsList');
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color:#777;">No jobs yet</p>';
+                    return;
+                }
+                list.innerHTML = data.map(j => `
+                    <div class="list-item">
+                        <div>
+                            <div style="font-weight:500;">${j.title}</div>
+                            <div style="font-size:12px;color:#777;">${j.company} · ${j.location}</div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteJob(${j.id})">Delete</button>
+                    </div>`).join('');
+            } catch(e) {
+                document.getElementById('jobsList').innerHTML =
+                    '<p style="color:#777;">Could not load</p>';
+            }
+        }
+
+        // Load Announcements
+        async function loadAnnouncements() {
+            try {
+                const res = await fetch('/api/announcements/all');
+                const data = await res.json();
+                const list = document.getElementById('annList');
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color:#777;">No announcements yet</p>';
+                    return;
+                }
+                list.innerHTML = data.map(a => `
+                    <div class="list-item">
+                        <div>
+                            <div style="font-weight:500;">${a.title}</div>
+                            <div style="font-size:12px;color:#777;">${a.content.substring(0,60)}...</div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteAnnouncement(${a.id})">Delete</button>
+                    </div>`).join('');
+            } catch(e) {
+                document.getElementById('annList').innerHTML =
+                    '<p style="color:#777;">Could not load</p>';
+            }
+        }
+
+        // Create Event
+        async function createEvent() {
+            const data = {
+                title: document.getElementById('eventTitle').value,
+                description: document.getElementById('eventDesc').value,
+                location: document.getElementById('eventLocation').value,
+                eventDate: document.getElementById('eventDate').value.substring(0,19)
+            };
+            try {
+                const res = await fetch(`/api/events/create/${ADMIN_USER_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const msg = await res.text();
+                document.getElementById('eventMsg').innerHTML =
+                    `<div class="success-box">${msg}</div>`;
+                loadEvents(); loadStats();
+            } catch(e) {
+                document.getElementById('eventMsg').innerHTML =
+                    `<div class="error-box">Failed to create event!</div>`;
+            }
+        }
+
+        // Create Job
+        async function createJob() {
+            const data = {
+                title: document.getElementById('jobTitle').value,
+                company: document.getElementById('jobCompany').value,
+                location: document.getElementById('jobLocation').value,
+                description: document.getElementById('jobDesc').value
+            };
+            try {
+                const res = await fetch(`/api/jobs/create/${ADMIN_USER_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const msg = await res.text();
+                document.getElementById('jobMsg').innerHTML =
+                    `<div class="success-box">${msg}</div>`;
+                loadJobs(); loadStats();
+            } catch(e) {
+                document.getElementById('jobMsg').innerHTML =
+                    `<div class="error-box">Failed to post job!</div>`;
+            }
+        }
+
+        // Create Announcement
+        async function createAnnouncement() {
+            const data = {
+                title: document.getElementById('annTitle').value,
+                content: document.getElementById('annContent').value
+            };
+            try {
+                const res = await fetch(`/api/announcements/create/${ADMIN_USER_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const msg = await res.text();
+                document.getElementById('annMsg').innerHTML =
+                    `<div class="success-box">${msg}</div>`;
+                loadAnnouncements(); loadStats();
+            } catch(e) {
+                document.getElementById('annMsg').innerHTML =
+                    `<div class="error-box">Failed to post announcement!</div>`;
+            }
+        }
+
+        // Delete functions
+        async function deleteEvent(id) {
+            if (!confirm('Delete this event?')) return;
+            await fetch(`/api/events/${id}`, { method: 'DELETE' });
+            loadEvents(); loadStats();
+        }
+
+        async function deleteJob(id) {
+            if (!confirm('Delete this job?')) return;
+            await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+            loadJobs(); loadStats();
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('Delete this announcement?')) return;
+            await fetch(`/api/announcements/${id}`, { method: 'DELETE' });
+            loadAnnouncements(); loadStats();
+        }
+    </script>
+
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+    </style>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Alumni Directory - AlumniMS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">🎓 AlumniMS</a>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/events">Events</a>
+            <a href="/jobs">Jobs</a>
+            <a href="/announcements">Announcements</a>
+            <a href="/directory" style="color:#185FA5;font-weight:500;">Directory</a>
+            <a href="/login" class="btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard">
+
+        <!-- Header -->
+        <div class="welcome-banner">
+            <h2>👥 Alumni Directory</h2>
+            <p>Search and connect with alumni from your institution</p>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="directory-filters">
+            <input
+                type="text"
+                id="searchName"
+                placeholder="🔍 Search by name..."
+                oninput="filterAlumni()"
+                class="filter-input" />
+            <select id="filterBatch" onchange="filterAlumni()" class="filter-select">
+                <option value="">All Batches</option>
+            </select>
+            <select id="filterDept" onchange="filterAlumni()" class="filter-select">
+                <option value="">All Departments</option>
+            </select>
+            <button onclick="resetFilters()" class="btn-outline">Reset</button>
+        </div>
+
+        <!-- Stats Row -->
+        <div style="margin-bottom:20px;">
+            <span id="alumniCount" style="font-size:13px;color:#777;">
+                Loading...
+            </span>
+        </div>
+
+        <!-- Alumni Grid -->
+        <div id="alumniGrid" class="alumni-grid">
+            <p style="color:#777;font-size:13px;">Loading alumni...</p>
+        </div>
+
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let allAlumni = [];
+
+        window.onload = function() {
+            loadAlumni();
+        };
+
+        async function loadAlumni() {
+            try {
+                const res = await fetch('/api/alumni/all');
+                allAlumni = await res.json();
+                populateFilters();
+                renderAlumni(allAlumni);
+            } catch(e) {
+                document.getElementById('alumniGrid').innerHTML =
+                    '<p style="color:#777;">Could not load alumni</p>';
+            }
+        }
+
+        // Populate batch and department dropdowns
+        function populateFilters() {
+            const batches = [...new Set(allAlumni.map(a => a.batchYear))].sort();
+            const depts = [...new Set(allAlumni.map(a => a.department))].filter(Boolean).sort();
+
+            const batchSelect = document.getElementById('filterBatch');
+            batches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b;
+                batchSelect.appendChild(opt);
+            });
+
+            const deptSelect = document.getElementById('filterDept');
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                deptSelect.appendChild(opt);
+            });
+        }
+
+        // Render Alumni Cards
+        function renderAlumni(alumni) {
+            const grid = document.getElementById('alumniGrid');
+            document.getElementById('alumniCount').textContent =
+                `Showing ${alumni.length} alumni`;
+
+            if (alumni.length === 0) {
+                grid.innerHTML = '<p style="color:#777;">No alumni found!</p>';
+                return;
+            }
+
+            grid.innerHTML = alumni.map(a => `
+                <div class="alumni-card" onclick="showProfile(${a.id})">
+                    <div class="alumni-avatar">
+                        ${getInitials(a.firstName, a.lastName)}
+                    </div>
+                    <div class="alumni-name">${a.firstName} ${a.lastName}</div>
+                    <div class="alumni-role">
+                        ${a.currentRole || 'Alumni'} 
+                        ${a.currentCompany ? 'at ' + a.currentCompany : ''}
+                    </div>
+                    <div class="alumni-tags">
+                        <span class="badge badge-blue">${a.batchYear}</span>
+                        <span class="badge badge-green">${a.department || ''}</span>
+                    </div>
+                    ${a.location ? `
+                        <div class="alumni-location">📍 ${a.location}</div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Filter Alumni
+        function filterAlumni() {
+            const name = document.getElementById('searchName').value.toLowerCase();
+            const batch = document.getElementById('filterBatch').value;
+            const dept = document.getElementById('filterDept').value;
+
+            const filtered = allAlumni.filter(a => {
+                const fullName = `${a.firstName} ${a.lastName}`.toLowerCase();
+                const matchName = fullName.includes(name);
+                const matchBatch = batch ? String(a.batchYear) === String(batch) : true;
+                const matchDept = dept ? a.department === dept : true;
+                return matchName && matchBatch && matchDept;
+            });
+
+            renderAlumni(filtered);
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('filterBatch').value = '';
+            document.getElementById('filterDept').value = '';
+            renderAlumni(allAlumni);
+        }
+
+        // Show Profile Modal
+        function showProfile(id) {
+            const a = allAlumni.find(x => x.id === id);
+            if (!a) return;
+
+            document.getElementById('modalContent').innerHTML = `
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div class="alumni-avatar" style="width:70px;height:70px;font-size:24px;margin:0 auto 12px;">
+                        ${getInitials(a.firstName, a.lastName)}
+                    </div>
+                    <h2 style="font-size:20px;font-weight:500;color:#0C447C;">
+                        ${a.firstName} ${a.lastName}
+                    </h2>
+                    <p style="color:#777;font-size:14px;">
+                        ${a.currentRole || ''} ${a.currentCompany ? 'at ' + a.currentCompany : ''}
+                    </p>
+                </div>
+                <div class="profile-details">
+                    ${detailRow('🎓', 'Batch', a.batchYear)}
+                    ${detailRow('🏛️', 'Department', a.department)}
+                    ${detailRow('📚', 'Degree', a.degree)}
+                    ${detailRow('🏢', 'Company', a.currentCompany)}
+                    ${detailRow('💼', 'Role', a.currentRole)}
+                    ${detailRow('📍', 'Location', a.location)}
+                    ${detailRow('📞', 'Phone', a.phone)}
+                    ${a.linkedinUrl ? `
+                        <div class="detail-row">
+                            <span class="detail-icon">🔗</span>
+                            <div>
+                                <div class="detail-label">LinkedIn</div>
+                                <a href="https://${a.linkedinUrl}" target="_blank"
+                                   style="color:#185FA5;font-size:14px;">
+                                   View Profile
+                                </a>
+                            </div>
+                        </div>` : ''}
+                </div>
+            `;
+
+            document.getElementById('profileModal').style.display = 'flex';
+        }
+
+        function detailRow(icon, label, value) {
+            if (!value) return '';
+            return `
+                <div class="detail-row">
+                    <span class="detail-icon">${icon}</span>
+                    <div>
+                        <div class="detail-label">${label}</div>
+                        <div class="detail-value">${value}</div>
+                    </div>
+                </div>`;
+        }
+
+        function closeModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+
+        function getInitials(first, last) {
+            return `${(first || '?')[0]}${(last || '?')[0]}`.toUpperCase();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('profileModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+
+</body>
+</html>

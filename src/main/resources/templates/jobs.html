@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Jobs - AlumniMS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">🎓 AlumniMS</a>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/events">Events</a>
+            <a href="/jobs">Jobs</a>
+            <a href="/announcements">Announcements</a>
+            <a href="/directory">Directory</a>
+            <a href="/login" class="btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard">
+
+        <div class="welcome-banner">
+            <h2>💼 Job Board</h2>
+            <p>Find and post job opportunities within the alumni network</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="searchInput"
+                placeholder="Search by company or location..."
+                oninput="filterJobs()" />
+        </div>
+
+        <!-- Jobs List -->
+        <div id="jobsList">
+            <p style="color:#777;font-size:13px;">Loading jobs...</p>
+        </div>
+
+    </div>
+
+    <script>
+        let allJobs = [];
+
+        window.onload = function() {
+            loadJobs();
+        };
+
+        async function loadJobs() {
+            try {
+                const res = await fetch('/api/jobs/all');
+                allJobs = await res.json();
+                renderJobs(allJobs);
+            } catch(e) {
+                document.getElementById('jobsList').innerHTML =
+                    '<p style="color:#777;">Could not load jobs</p>';
+            }
+        }
+
+        function renderJobs(jobs) {
+            const list = document.getElementById('jobsList');
+
+            if (jobs.length === 0) {
+                list.innerHTML = '<p style="color:#777;font-size:13px;">No jobs found!</p>';
+                return;
+            }
+
+            list.innerHTML = jobs.map(job => `
+                <div class="job-card">
+                    <div class="job-info">
+                        <h4>${job.title}</h4>
+                        <p>${job.description || ''}</p>
+                        <div class="job-meta">
+                            <span class="badge badge-blue">🏢 ${job.company}</span>
+                            <span class="badge badge-green">📍 ${job.location}</span>
+                        </div>
+                    </div>
+                    <div class="job-action">
+                        <span style="font-size:11px;color:#777;">
+                            ${job.postedAt ? job.postedAt.substring(0,10) : ''}
+                        </span>
+                        <button class="btn-primary" style="margin-top:8px;">Apply</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterJobs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allJobs.filter(job =>
+                job.company.toLowerCase().includes(query) ||
+                job.location.toLowerCase().includes(query) ||
+                job.title.toLowerCase().includes(query)
+            );
+            renderJobs(filtered);
+        }
+    </script>
+
+</body>
+</html>

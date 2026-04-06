@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Profile - AlumniMS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">🎓 AlumniMS</a>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/directory">Directory</a>
+            <a href="/events">Events</a>
+            <a href="/jobs">Jobs</a>
+            <a href="/login" class="btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div style="max-width:600px;margin:40px auto;padding:0 20px;">
+
+        <div class="welcome-banner" style="margin-bottom:24px;">
+            <h2>👤 Create Your Profile</h2>
+            <p>Fill in your details to appear in the alumni directory</p>
+        </div>
+
+        <div class="card">
+
+            <div id="errorMsg" class="error-box" style="display:none;"></div>
+            <div id="successMsg" class="success-box" style="display:none;"></div>
+
+            <!-- User ID -->
+            <div style="background:#f5f7fa;border-radius:8px;
+            padding:12px 16px;margin-bottom:16px;
+            display:flex;align-items:center;gap:10px;">
+    <span style="font-size:20px;">👤</span>
+    <div>
+        <div style="font-size:12px;color:#999;">Logged in as</div>
+        <div style="font-size:14px;font-weight:500;
+                    color:#0C447C;" id="userEmail">
+            Loading...
+        </div>
+    </div>
+</div>
+<input type="hidden" id="userId" />
+
+            <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0;" />
+
+            <!-- Personal Info -->
+            <div style="font-size:13px;font-weight:500;
+                        color:#185FA5;margin-bottom:12px;">
+                Personal Information
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" id="firstName" placeholder="John" />
+                </div>
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="lastName" placeholder="Doe" />
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="phone" placeholder="9876543210" />
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender">
+                        <option value="">Select gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="dateOfBirth" />
+            </div>
+
+            <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0;" />
+
+            <!-- Education Info -->
+            <div style="font-size:13px;font-weight:500;
+                        color:#185FA5;margin-bottom:12px;">
+                Education Details
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label>Batch Year *</label>
+                    <input type="number" id="batchYear"
+                        placeholder="2022" min="1980" max="2030" />
+                </div>
+                <div class="form-group">
+                    <label>Degree</label>
+                    <input type="text" id="degree" placeholder="B.Tech" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Department *</label>
+                <input type="text" id="department"
+                    placeholder="Computer Science" />
+            </div>
+
+            <hr style="border:none;border-top:1px solid #f0f0f0;margin:16px 0;" />
+
+            <!-- Professional Info -->
+            <div style="font-size:13px;font-weight:500;
+                        color:#185FA5;margin-bottom:12px;">
+                Professional Details
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label>Current Company</label>
+                    <input type="text" id="currentCompany" placeholder="Google" />
+                </div>
+                <div class="form-group">
+                    <label>Current Role</label>
+                    <input type="text" id="currentRole"
+                        placeholder="Software Engineer" />
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="location" placeholder="Pune" />
+                </div>
+                <div class="form-group">
+                    <label>LinkedIn URL</label>
+                    <input type="text" id="linkedinUrl"
+                        placeholder="linkedin.com/in/johndoe" />
+                </div>
+            </div>
+
+            <button class="form-submit" onclick="createProfile()">
+                Create My Profile
+            </button>
+
+        </div>
+    </div>
+
+<script>
+    // Get user from localStorage
+    const alumniUser = JSON.parse(localStorage.getItem('alumniUser'));
+
+    window.onload = function() {
+        if (!alumniUser) {
+            // Not logged in - redirect to login
+            alert('Please login first!');
+            window.location.href = '/login';
+            return;
+        }
+        // Auto fill user ID
+        document.getElementById('userId').value = alumniUser.id;
+        document.getElementById('userId').readOnly = true;
+        document.getElementById('userEmail').textContent = alumniUser.email;
+    };
+
+    async function createProfile() {
+        const userId = document.getElementById('userId').value;
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const batchYear = document.getElementById('batchYear').value;
+        const department = document.getElementById('department').value;
+
+        if (!firstName || !lastName || !batchYear || !department) {
+            showError('Please fill in all required fields (marked with *)');
+            return;
+        }
+
+        const data = {
+            firstName,
+            lastName,
+            phone: document.getElementById('phone').value,
+            gender: document.getElementById('gender').value,
+            dateOfBirth: document.getElementById('dateOfBirth').value,
+            batchYear,
+            department,
+            degree: document.getElementById('degree').value,
+            currentCompany: document.getElementById('currentCompany').value,
+            currentRole: document.getElementById('currentRole').value,
+            location: document.getElementById('location').value,
+            linkedinUrl: document.getElementById('linkedinUrl').value
+        };
+
+        try {
+            const res = await fetch(`/api/alumni/profile/${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const msg = await res.text();
+
+            if (res.ok) {
+                showSuccess('Profile created! Redirecting to directory...');
+                setTimeout(() => window.location.href = '/directory', 1500);
+            } else {
+                showError(msg);
+            }
+        } catch(e) {
+            showError('Something went wrong. Please try again!');
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('errorMsg');
+        el.textContent = msg;
+        el.style.display = 'block';
+        document.getElementById('successMsg').style.display = 'none';
+        window.scrollTo(0, 0);
+    }
+
+    function showSuccess(msg) {
+        const el = document.getElementById('successMsg');
+        el.textContent = msg;
+        el.style.display = 'block';
+        document.getElementById('errorMsg').style.display = 'none';
+        window.scrollTo(0, 0);
+    }
+</script>
+</body>
+</html>

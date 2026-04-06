@@ -1,9 +1,242 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"> 
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 40px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.nav-brand {
+    font-size: 20px;
+    font-weight: 600;
+    color: #185FA5;
+}
+
+.nav-links {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Buttons */
+.btn-primary {
+    background: #185FA5;
+    color: white !important;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-outline {
+    border: 1px solid #185FA5;
+    color: #185FA5 !important;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: 80px 40px;
+    background: linear-gradient(135deg, #E6F1FB, #EEEDFE);
+}
+
+.hero h1 {
+    font-size: 36px;
+    font-weight: 600;
+    color: #0C447C;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    font-size: 16px;
+    color: #185FA5;
+    margin-bottom: 28px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Features */
+.features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 60px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+}
+
+.feature-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.feature-card h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #185FA5;
+}
+
+.feature-card p {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.6;
+}
+
+/* Forms */
+.form-container {
+    max-width: 420px;
+    margin: 60px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 36px;
+    border: 1px solid #e0e0e0;
+}
+
+.form-container h2 {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    color: #0C447C;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #185FA5;
+}
+
+.form-submit {
+    width: 100%;
+    padding: 11px;
+    background: #185FA5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #777;
+}
+
+.form-footer a {
+    color: #185FA5;
+    text-decoration: none;
+}
+
+/* Error and Success Boxes */
+.error-box {
+    background: #FCEBEB;
+    color: #A32D2D;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    border: 1px solid #F7C1C1;
+}
+
+.success-box {
+    background: #EAF3DE;
+    color: #3B6D11;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    border: 1px solid #C0DD97;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #E6F1FB, #EEEDFE);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+.welcome-banner h2 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #0C447C;
+    margin-bottom: 4px;
+}
+
+.welcome-banner p {
+    font-size: 14px;
+    color: #185FA5;
+}
+    </style>
 <head>
     <meta charset="UTF-8">
     <title>Alumni Portal</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
 </head>
 <body>
 

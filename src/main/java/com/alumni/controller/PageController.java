@@ -30,4 +30,24 @@ public class PageController {
     public String events() {
         return "events";
     }
+    @GetMapping("/announcements")
+    public String announcements() {
+        return "announcements";
+    }
+    @GetMapping("/jobs")
+    public String jobs() {
+        return "jobs";
+    }
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin";
+    }
+    @GetMapping("/directory")
+    public String directory() {
+        return "directory";
+    }
+    @GetMapping("/profile/create")
+    public String createProfile() {
+        return "create-profile";
+    }
 }

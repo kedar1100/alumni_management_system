@@ -1,1 +1,109 @@
-yet to be done
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Events - AlumniMS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand">🎓 AlumniMS</a>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/events">Events</a>
+            <a href="/jobs">Jobs</a>
+            <a href="/announcements">Announcements</a>
+            <a href="/directory">Directory</a>
+            <a href="/login" class="btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard">
+
+        <!-- Header -->
+        <div class="welcome-banner">
+            <h2>📅 Events</h2>
+            <p>Browse and register for upcoming alumni events</p>
+        </div>
+
+        <!-- Events List -->
+        <div class="card">
+            <h3>Upcoming Events</h3>
+            <div id="eventsList">
+                <p style="color:#777;font-size:13px;">Loading events...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        window.onload = function() {
+            loadEvents();
+        };
+
+        async function loadEvents() {
+            try {
+                const res = await fetch('/api/events/all');
+                const data = await res.json();
+
+                const list = document.getElementById('eventsList');
+
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="color:#777;font-size:13px;">No events yet!</p>';
+                    return;
+                }
+
+                list.innerHTML = data.map(event => `
+                    <div class="event-card">
+                        <div class="event-left">
+                            <div class="event-date-box">
+                                <div class="event-day">${event.eventDate ? event.eventDate.substring(8,10) : ''}</div>
+                                <div class="event-month">${getMonth(event.eventDate)}</div>
+                            </div>
+                        </div>
+                        <div class="event-info">
+                            <h4>${event.title}</h4>
+                            <p>${event.description || ''}</p>
+                            <div class="event-meta">
+                                <span>📍 ${event.location || 'TBD'}</span>
+                                <span>🕐 ${event.eventDate ? event.eventDate.substring(11,16) : ''}</span>
+                            </div>
+                        </div>
+                        <div class="event-action">
+                            <button class="btn-primary" onclick="registerEvent(${event.id})">
+                                Register
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch(e) {
+                document.getElementById('eventsList').innerHTML =
+                    '<p style="color:#777;">Could not load events</p>';
+            }
+        }
+
+        async function registerEvent(eventId) {
+            const alumniId = 1; // we'll make this dynamic later
+            try {
+                const res = await fetch(`/api/events/${eventId}/register/${alumniId}`, {
+                    method: 'POST'
+                });
+                const msg = await res.text();
+                alert(msg);
+            } catch(e) {
+                alert('Registration failed!');
+            }
+        }
+
+        function getMonth(dateStr) {
+            if (!dateStr) return '';
+            const months = ['JAN','FEB','MAR','APR','MAY','JUN',
+                           'JUL','AUG','SEP','OCT','NOV','DEC'];
+            return months[new Date(dateStr).getMonth()];
+        }
+    </script>
+
+</body>
+</html>

@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - AlumniMS</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-    <!-- Navbar -->
     <nav class="navbar">
         <a href="/" class="nav-brand">🎓 AlumniMS</a>
         <div class="nav-links">
@@ -15,15 +14,11 @@
         </div>
     </nav>
 
-    <!-- Login Form -->
     <div class="form-container">
         <h2>Welcome Back! 👋</h2>
 
-        <!-- Error Message -->
-        <div id="error-msg" class="error-box" style="display:none;"></div>
-
-        <!-- Success Message -->
-        <div id="success-msg" class="success-box" style="display:none;"></div>
+        <div id="errorMsg" class="error-box" style="display:none;"></div>
+        <div id="successMsg" class="success-box" style="display:none;"></div>
 
         <div class="form-group">
             <label>Email Address</label>
@@ -32,7 +27,9 @@
 
         <div class="form-group">
             <label>Password</label>
-            <input type="password" id="password" placeholder="Enter your password" />
+            <input type="password" id="password"
+                placeholder="Enter your password"
+                onkeypress="if(event.key==='Enter') handleLogin()" />
         </div>
 
         <button class="form-submit" onclick="handleLogin()">Login</button>
@@ -43,6 +40,11 @@
     </div>
 
     <script>
+        // If already logged in redirect to dashboard
+        if (localStorage.getItem('alumniUser')) {
+            window.location.href = '/dashboard';
+        }
+
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -59,31 +61,35 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                const result = await response.text();
+                const result = await response.json();
 
                 if (response.ok) {
+                    // Save user to localStorage
+                    localStorage.setItem('alumniUser', JSON.stringify({
+                        id: result.id,
+                        email: result.email,
+                        role: result.role
+                    }));
                     showSuccess('Login successful! Redirecting...');
                     setTimeout(() => window.location.href = '/dashboard', 1500);
                 } else {
-                    showError(result);
+                    showError(result || 'Login failed!');
                 }
-            } catch (error) {
+            } catch(e) {
                 showError('Something went wrong. Please try again!');
             }
         }
 
         function showError(msg) {
-            const el = document.getElementById('error-msg');
-            el.textContent = msg;
-            el.style.display = 'block';
-            document.getElementById('success-msg').style.display = 'none';
+            document.getElementById('errorMsg').textContent = msg;
+            document.getElementById('errorMsg').style.display = 'block';
+            document.getElementById('successMsg').style.display = 'none';
         }
 
         function showSuccess(msg) {
-            const el = document.getElementById('success-msg');
-            el.textContent = msg;
-            el.style.display = 'block';
-            document.getElementById('error-msg').style.display = 'none';
+            document.getElementById('successMsg').textContent = msg;
+            document.getElementById('successMsg').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
         }
     </script>
 
